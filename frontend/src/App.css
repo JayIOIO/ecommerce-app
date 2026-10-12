@@ -124,6 +124,18 @@ body {
   font-size: 14px;
 }
 
+.build-label {
+  font-size: 12px;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.auth-header .build-label {
+  display: inline-block;
+  margin-top: 12px;
+  opacity: 0.9;
+}
+
 .btn-logout {
   background: transparent;
   color: #ffffff;

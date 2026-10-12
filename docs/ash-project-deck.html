@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#101728" />
+    <title>EcomApp | Team project presentation draft</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: Inter, "Segoe UI", Arial, sans-serif;
+        background: #101728;
+        color: #f4f6fb;
+        --muted: #adb8ca;
+        --orange: #ff805d;
+        --panel: #1a263a;
+        --line: #34435a;
+      }
+
+      * { box-sizing: border-box; }
+      body { margin: 0; min-height: 100vh; }
+      .slide {
+        display: none;
+        width: min(100vw, 177.78vh);
+        min-height: min(100vh, 56.25vw);
+        margin: auto;
+        padding: clamp(2rem, 6vw, 6rem);
+        position: relative;
+        overflow: auto;
+        background:
+          radial-gradient(ellipse at 88% 8%, #283653 0, transparent 35%),
+          linear-gradient(140deg, #101728, #131e31 68%, #17233a);
+      }
+      .slide.active { display: flex; flex-direction: column; justify-content: center; gap: 1.5rem; }
+      .slide::after {
+        content: "";
+        position: absolute;
+        inset: auto 0 0;
+        height: 5px;
+        background: linear-gradient(90deg, var(--orange), #ffc47b);
+      }
+      .eyebrow { color: var(--orange); font-size: .82rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+      h1 { font-size: clamp(3rem, 7vw, 6.5rem); letter-spacing: -.055em; line-height: .98; margin: 0; max-width: 12ch; }
+      h2 { font-size: clamp(2rem, 4vw, 3.6rem); letter-spacing: -.04em; line-height: 1.04; margin: 0; max-width: 19ch; }
+      h3 { margin: 0 0 .55rem; color: #fff; font-size: 1.1rem; }
+      p, li { color: var(--muted); font-size: clamp(1rem, 1.45vw, 1.3rem); line-height: 1.55; }
+      p { max-width: 68ch; margin: 0; }
+      ul { margin: .3rem 0 0; padding-left: 1.25rem; }
+      li + li { margin-top: .35rem; }
+      a { color: #ffd0b8; }
+      .subtitle { font-size: clamp(1.1rem, 2vw, 1.55rem); max-width: 52ch; }
+      .meta { border-left: 3px solid var(--orange); padding-left: 1rem; margin-top: 1rem; }
+      .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+      .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .card { border: 1px solid var(--line); border-radius: 14px; background: #1a263aee; padding: 1.2rem 1.35rem; }
+      .card p, .card li { font-size: clamp(.92rem, 1.2vw, 1.08rem); }
+      .tag { display: inline-block; width: fit-content; border: 1px solid #52637c; border-radius: 99px; padding: .32rem .7rem; color: #d9e2f0; font-size: .82rem; }
+      .tag.warn { border-color: #a95a45; color: #ffc4aa; }
+      .flow { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .65rem; }
+      .node { border: 1px solid #52637c; border-radius: 12px; background: var(--panel); padding: .85rem 1rem; text-align: center; color: #fff; }
+      .arrow { color: var(--orange); font-size: 1.5rem; font-weight: 800; }
+      .callout { border: 1px solid #986448; border-radius: 12px; padding: 1rem 1.2rem; color: #ffdbc8; background: #3b2b2a55; }
+      .big-number { color: var(--orange); font-weight: 900; font-size: 2rem; }
+      .small { font-size: .9rem; }
+      .controls {
+        position: fixed; z-index: 4; bottom: 1rem; right: 1.2rem;
+        display: flex; align-items: center; gap: .5rem;
+        border: 1px solid #52637c; border-radius: 99px; padding: .4rem;
+        background: #101728eF;
+      }
+      .controls button {
+        width: 2.4rem; height: 2.4rem; border: 0; border-radius: 50%;
+        background: #293851; color: white; font-size: 1.1rem; cursor: pointer;
+      }
+      .controls button:focus-visible, a:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
+      #counter { min-width: 3.4rem; color: var(--muted); text-align: center; font-variant-numeric: tabular-nums; }
+      .footer { position: absolute; bottom: 1.3rem; left: clamp(2rem, 6vw, 6rem); color: #8998ae; font-size: .82rem; }
+      @media (max-width: 700px) {
+        .slide { min-height: 100vh; width: 100vw; padding: 2rem 1.4rem 4.5rem; }
+        .grid, .grid.three { grid-template-columns: 1fr; }
+        .footer { left: 1.4rem; }
+      }
+      @media print {
+        body { background: white; }
+        .slide, .slide.active {
+          display: flex !important; width: 100%; height: 100vh; min-height: 0;
+          break-after: page; page-break-after: always; print-color-adjust: exact;
+        }
+        .controls { display: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <main aria-label="EcomApp project presentation">
+      <section class="slide active" aria-label="Slide 1">
+        <span class="eyebrow">System Architecture · Team project</span>
+        <h1>EcomApp</h1>
+        <p class="subtitle">A buyer-and-seller marketplace, delivered through a collaborative path from application features toward automated deployment.</p>
+        <div class="meta">
+          <p><strong>Team:</strong> Salenga · Riboroso · Tato · Ash</p>
+          <p><strong>Roster check:</strong> fifth required member not yet confirmed; add the real member before submission.</p>
+        </div>
+        <span class="tag warn">Presentation draft · feature-stage checkout</span>
+        <span class="footer">Use ← / → or the on-screen controls</span>
+      </section>
+
+      <section class="slide" aria-label="Slide 2">
+        <span class="eyebrow">01 · The application</span>
+        <h2>One storefront, three service boundaries</h2>
+        <div class="grid three">
+          <article class="card"><h3>Buyer experience</h3><p>Browse and search products, manage a cart, check out, and review orders.</p></article>
+          <article class="card"><h3>Seller experience</h3><p>Manage owned listings, see relevant orders, and update fulfillment status.</p></article>
+          <article class="card"><h3>Service modules</h3><p>Authentication, catalog/inventory, and order management share MySQL-backed data.</p></article>
+        </div>
+        <p>These features are present in the starter baseline. Contributions and final behavior must be attributed to the actual reviewed work, not assumed.</p>
+        <span class="footer">Source: repository README and feature-stage service layout</span>
+      </section>
+
+      <section class="slide" aria-label="Slide 3">
+        <span class="eyebrow">02 · Architecture today</span>
+        <h2>Verified checkout: local feature-stage topology</h2>
+        <div class="flow" aria-label="Browser to Vite to API services to MySQL">
+          <span class="node">Browser</span><span class="arrow">→</span>
+          <span class="node">React / Vite<br><small>dev server :5173</small></span><span class="arrow">→</span>
+          <span class="node">Auth :4001<br>Catalog :4002<br>Orders :4003</span><span class="arrow">→</span>
+          <span class="node">Local MySQL</span>
+        </div>
+        <div class="callout">This is the starter's local-development path. Docker, Compose, deployment NGINX, and Jenkins are not present in this checkout.</div>
+        <span class="footer">Do not present the target deployment as already integrated</span>
+      </section>
+
+      <section class="slide" aria-label="Slide 4">
+        <span class="eyebrow">03 · Technology choices</span>
+        <h2>Keep the stack aligned to the module boundaries</h2>
+        <div class="grid">
+          <article class="card"><h3>React + Vite</h3><p>Component-based buyer/seller UI with a fast development server and a build-time static bundle.</p></article>
+          <article class="card"><h3>Node.js + Express</h3><p>Three independently organized APIs make authentication, catalog, and order ownership visible.</p></article>
+          <article class="card"><h3>MySQL</h3><p>Relational tables express users, products, orders, and item relationships.</p></article>
+          <article class="card"><h3>Deployment tools</h3><p>Docker, Compose, NGINX, and Jenkins are planned team-stage additions; include their rationale after review.</p></article>
+        </div>
+      </section>
+
+      <section class="slide" aria-label="Slide 5">
+        <span class="eyebrow">04 · User journeys</span>
+        <h2>Two roles, different actions</h2>
+        <div class="grid">
+          <article class="card"><h3>Buyer path</h3><p>Sign up / log in → search → cart → checkout → order history → cancel eligible pending order.</p></article>
+          <article class="card"><h3>Seller path</h3><p>Sign up / log in → create, edit, delete listing → view seller orders → advance fulfillment.</p></article>
+        </div>
+        <div class="callout">The current browser QA could not verify complete journeys: API requests returned HTTP 403 and disposable credentials were unavailable. See the checklist; do not claim these paths passed.</div>
+      </section>
+
+      <section class="slide" aria-label="Slide 6">
+        <span class="eyebrow">05 · Visible build identity</span>
+        <h2>Make the browser tell the truth about the bundle</h2>
+        <div class="grid">
+          <article class="card"><h3>Build-time source</h3><p><code>VITE_BUILD_ID</code> is compiled into the UI at build time. An unset value is labeled “unlabeled build”.</p></article>
+          <article class="card"><h3>Release rule</h3><p>CI should set it to the actual checked-out commit or release ID before building the frontend image. Never ship a hand-typed build claim.</p></article>
+        </div>
+        <p>The label is displayed on both the sign-in screen and the signed-in header.</p>
+        <span class="footer">Verify the merged image and visible value together in the final proxy</span>
+      </section>
+
+      <section class="slide" aria-label="Slide 7">
+        <span class="eyebrow">06 · Docker</span>
+        <h2>Containerization is a team integration gate</h2>
+        <div class="grid">
+          <article class="card"><h3>Planned deliverable</h3><p>Reviewed custom Dockerfiles and ignore rules for team-authored application modules, using reproducible builds.</p></article>
+          <article class="card"><h3>Evidence required</h3><p>Successful image builds, image/source tags, runtime health, and a clean configuration check.</p></article>
+        </div>
+        <div class="callout">No Dockerfiles or Compose configuration are present in this feature-stage checkout. This slide is a plan, not a completion claim.</div>
+      </section>
+
+      <section class="slide" aria-label="Slide 8">
+        <span class="eyebrow">07 · Compose & persistence</span>
+        <h2>One-command startup needs durable state</h2>
+        <div class="flow">
+          <span class="node">Frontend</span><span class="node">Auth</span><span class="node">Catalog</span><span class="node">Orders</span>
+          <span class="arrow">→</span><span class="node">MySQL<br>named volume</span>
+        </div>
+        <ul>
+          <li>Agree health checks, service dependencies, private networks, and environment settings with infrastructure/backend owners.</li>
+          <li>Prove persistence by writing safe disposable data, restarting the stack, and reading it back.</li>
+        </ul>
+        <div class="callout">Compose, a named database volume, and persistence proof are not in this checkout.</div>
+      </section>
+
+      <section class="slide" aria-label="Slide 9">
+        <span class="eyebrow">08 · Jenkins & trigger</span>
+        <h2>Push → checks → tested build → deploy</h2>
+        <div class="flow">
+          <span class="node">Git push</span><span class="arrow">→</span><span class="node">Jenkins trigger</span>
+          <span class="arrow">→</span><span class="node">Quality gate</span><span class="arrow">→</span><span class="node">Deploy & verify</span>
+        </div>
+        <p>Final demo evidence should include an automatic trigger without “Build Now”, a successful pipeline, and a deliberately failing test that blocks deployment.</p>
+        <div class="callout">No Jenkinsfile, Jenkins stack, or automated trigger is present in this checkout. Coordinate implementation and run IDs with Riboroso.</div>
+      </section>
+
+      <section class="slide" aria-label="Slide 10">
+        <span class="eyebrow">09 · Tests & quality</span>
+        <h2>Quality checks should fail loudly and early</h2>
+        <div class="grid">
+          <article class="card"><h3>Available starter checks</h3><p><code>npm run lint</code><br><code>npm run build:frontend</code><br><code>npm run check:services</code></p></article>
+          <article class="card"><h3>Integration still needed</h3><p>A meaningful end-to-end buyer/seller smoke test should use unique disposable records, assert output, clean up, and exit nonzero on failure.</p></article>
+        </div>
+        <p>Record actual command output and pipeline status in the final deck after running the checks on the submission revision.</p>
+      </section>
+
+      <section class="slide" aria-label="Slide 11">
+        <span class="eyebrow">10 · Persistence proof</span>
+        <h2>Show the data survives a restart</h2>
+        <ol>
+          <li>Record a disposable test record and the active stack/image identifier.</li>
+          <li>Restart the application containers without deleting the named DB volume.</li>
+          <li>Read the record back through the application path and capture redacted evidence.</li>
+        </ol>
+        <div class="callout">This is a demo transition, not existing evidence: no container stack or volume proof is available in the current checkout.</div>
+      </section>
+
+      <section class="slide" aria-label="Slide 12">
+        <span class="eyebrow">11 · Rollback</span>
+        <h2>Demonstrate recovery, not just a rollback button</h2>
+        <div class="grid">
+          <article class="card"><h3>Before</h3><p>Record the known-good deployed image tag, source commit, and health response.</p></article>
+          <article class="card"><h3>After</h3><p>Redeploy that known-good tag, verify the proxy and UI, and record the pipeline run and resulting label.</p></article>
+        </div>
+        <div class="callout">Rollback behavior must be verified with Riboroso and Tato on the actual deployment host before presentation.</div>
+      </section>
+
+      <section class="slide" aria-label="Slide 13">
+        <span class="eyebrow">12 · QA snapshot</span>
+        <h2>Evidence first; status stays “not run”</h2>
+        <div class="grid">
+          <article class="card"><div class="big-number">403</div><h3>Observed API responses</h3><p>Several background API requests on the provided preview returned HTTP 403.</p></article>
+          <article class="card"><div class="big-number">0</div><h3>Complete flows passed</h3><p>No complete signup, checkout, order, listing, or fulfillment journey was verified in this session.</p></article>
+        </div>
+        <p>See <a href="./qa-checklist.md">docs/qa-checklist.md</a> for exact actions, outcomes, and blockers. Retest through the final proxy with disposable accounts.</p>
+      </section>
+
+      <section class="slide" aria-label="Slide 14">
+        <span class="eyebrow">13 · Ownership & next steps</span>
+        <h2>Coordinate the handoffs before the final demo</h2>
+        <div class="grid">
+          <article class="card"><h3>Ash · Frontend / QA / docs</h3><p>Build label, manual QA, README, smoke-test collaboration, technical outline, and this draft deck.</p></article>
+          <article class="card"><h3>Riboroso · Backend / CI-CD</h3><p>API/test explanation and smoke-test/pipeline coordination; confirm deliverables and run evidence.</p></article>
+          <article class="card"><h3>Tato · Infrastructure</h3><p>Architecture, containers, Compose, proxy, persistence, and deployment evidence.</p></article>
+          <article class="card"><h3>Salenga · Project lead</h3><p>Roster, issues, decisions, contributions, integration checkpoints, and presentation flow.</p></article>
+        </div>
+        <div class="callout">Confirm and assign the fifth distinct member; the course guide explicitly says not to invent a name or double-count a role.</div>
+      </section>
+
+      <section class="slide" aria-label="Slide 15">
+        <span class="eyebrow">14 · References & demo transition</span>
+        <h2>From feature baseline to verified delivery</h2>
+        <ul>
+          <li><a href="https://github.com/JayIOIO/FinalProject-CI-CD-Automation">FinalProject-CI-CD-Automation · reference project</a></li>
+          <li><a href="../README.md">This checkout's README</a> · feature-stage local setup and build-label source</li>
+          <li><a href="./qa-checklist.md">Frontend QA checklist</a> · actual browser observations and unrun journeys</li>
+          <li><a href="./technical-document-outline.md">Technical document outline</a> · evidence needed for the PDF</li>
+        </ul>
+        <div class="callout">Demo transition: show the actual proxy route, complete disposable buyer and seller journeys, pipeline run, persisted record, and verified rollback only after those artifacts exist.</div>
+        <p class="small">Replace this draft's planned items with dated output from the merged submission revision.</p>
+      </section>
+    </main>
+    <nav class="controls" aria-label="Slide controls">
+      <button id="previous" type="button" aria-label="Previous slide">←</button>
+      <span id="counter" aria-live="polite">1 / 15</span>
+      <button id="next" type="button" aria-label="Next slide">→</button>
+    </nav>
+    <script>
+      const slides = [...document.querySelectorAll('.slide')];
+      const counter = document.querySelector('#counter');
+      let index = 0;
+
+      function showSlide(nextIndex) {
+        index = (nextIndex + slides.length) % slides.length;
+        slides.forEach((slide, slideIndex) => {
+          slide.classList.toggle('active', slideIndex === index);
+          slide.setAttribute('aria-hidden', String(slideIndex !== index));
+        });
+        counter.textContent = `${index + 1} / ${slides.length}`;
+      }
+
+      document.querySelector('#previous').addEventListener('click', () => showSlide(index - 1));
+      document.querySelector('#next').addEventListener('click', () => showSlide(index + 1));
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowRight' || event.key === ' ') showSlide(index + 1);
+        if (event.key === 'ArrowLeft') showSlide(index - 1);
+      });
+      showSlide(0);
+    </script>
+  </body>
+</html>

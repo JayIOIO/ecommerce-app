@@ -3,6 +3,7 @@ import axios from 'axios';
 import './App.css';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
+const BUILD_LABEL = import.meta.env.VITE_BUILD_ID || 'unlabeled build';
 
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
@@ -279,6 +280,7 @@ export default function App() {
           <div className="auth-header">
             <h1>🛍 Shopee Clone</h1>
             <p>{isSignup ? 'Create your new account' : 'Log in to start shopping'}</p>
+            <small className="build-label">Build: {BUILD_LABEL}</small>
           </div>
 
           <form onSubmit={handleAuthSubmit} className="auth-form">
@@ -344,6 +346,7 @@ export default function App() {
             🛍️ <span>Shopee</span>
           </h2>
           <div className="user-info">
+            <small className="build-label">Build: {BUILD_LABEL}</small>
             <span>Welcome, <strong>{user?.name}</strong> ({user?.role})</span>
             <button onClick={handleLogout} className="btn-logout">Logout</button>
           </div>

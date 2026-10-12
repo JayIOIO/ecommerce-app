@@ -91,6 +91,23 @@ npm run build:frontend
 
 These checks validate backend JavaScript syntax and frontend lint/build. They are not a substitute for the integration tests the team should add in the later testing/automation phase.
 
+## Frontend build identifier
+
+The login and signed-in headers display a build identifier supplied at Vite build time through `VITE_BUILD_ID`. If it is unset, the UI says `unlabeled build`; this avoids implying a release identity that the build did not receive. To label a build with the source revision that produced it, set the value from that revision before building:
+
+```powershell
+$env:VITE_BUILD_ID = (git rev-parse --short HEAD)
+npm run build:frontend
+```
+
+The value is embedded in the frontend bundle; changing a runtime container environment variable after the bundle has been built does not change the displayed label. The deployment pipeline must supply the actual checked-out commit or release identifier as `VITE_BUILD_ID` when it builds the frontend image. Do not set a manually chosen build number that does not match the deployed image. Unset the PowerShell variable after the build with `Remove-Item Env:VITE_BUILD_ID`.
+
+Only use `git rev-parse --short HEAD` as the label when the build is from a clean checkout of that commit. On a dirty worktree, `HEAD` does not identify uncommitted changes; CI should use the immutable revision checked out for that run.
+
+## Frontend QA and submission-document drafts
+
+The current manual UI observations and unrun scenarios are recorded in [the QA checklist](docs/qa-checklist.md). Only scenarios actually exercised may be marked passed. The technical-document page plan is in [the technical document outline](docs/technical-document-outline.md), and the 15-slide presentation draft is [available as an HTML slide deck](docs/ash-project-deck.html). These drafts distinguish this feature-stage starter from the final Docker/Compose/Jenkins deployment; replace planned/demo placeholders with verified team evidence before submission.
+
 ## Team collaboration: use this as the shared GitHub base
 
 The repository owner should create a new GitHub repository and push this starter as its initial baseline. Add collaborators, then have each teammate clone that same repository and branch from the shared default branch:
