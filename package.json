@@ -1,0 +1,20 @@
+{
+  "name": "ecomapp-feature-base",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Feature-stage EcomApp starter before Docker, Jenkins, and deployment automation",
+  "scripts": {
+    "setup": "npm install && npm install --prefix services/auth-service && npm install --prefix services/catalog-service && npm install --prefix services/order-service && npm install --prefix frontend",
+    "dev": "concurrently -k -n auth,catalog,orders,frontend \"npm:dev:auth\" \"npm:dev:catalog\" \"npm:dev:orders\" \"npm:dev:frontend\"",
+    "dev:auth": "npm --prefix services/auth-service start",
+    "dev:catalog": "npm --prefix services/catalog-service start",
+    "dev:orders": "npm --prefix services/order-service start",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "check:services": "node --check services/auth-service/server.js && node --check services/catalog-service/server.js && node --check services/order-service/server.js",
+    "lint": "npm --prefix frontend run lint",
+    "build:frontend": "npm --prefix frontend run build"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5"
+  }
+}
