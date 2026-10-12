@@ -8,6 +8,7 @@ require('dotenv').config();
 const app = express();
 app.use(cors());
 app.use(express.json());
+// add dark mode 
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'db',
