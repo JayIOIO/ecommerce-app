@@ -9,6 +9,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const this is bad code = ; // this is a badcode
+
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'db',
   port: process.env.DB_PORT || 3306,
