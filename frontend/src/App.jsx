@@ -17,6 +17,7 @@ export default function App() {
   });
   const [isSignup, setIsSignup] = useState(false);
   const [activeTab, setActiveTab] = useState('shop');
+  const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
 
   const [products, setProducts] = useState([]);
   const [sellerProducts, setSellerProducts] = useState([]);
@@ -238,12 +239,21 @@ export default function App() {
   };
 
   const handleLogout = () => {
-    localStorage.clear();
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     setToken('');
     setUser(null);
     setCart([]);
     setOrders([]);
     setActiveTab('shop');
+  };
+
+  const handleThemeToggle = () => {
+    setIsDarkMode((currentMode) => {
+      const nextMode = !currentMode;
+      localStorage.setItem('theme', nextMode ? 'dark' : 'light');
+      return nextMode;
+    });
   };
 
   const handleCheckoutSubmit = async (e) => {
@@ -274,62 +284,73 @@ export default function App() {
 
   if (!token) {
     return (
-      <div className="auth-wrapper">
-        <div className="auth-card">
-          <div className="auth-header">
-            <h1>🛍 Shopee Clone</h1>
-            <p>{isSignup ? 'Create your new account' : 'Log in to start shopping'}</p>
-          </div>
+      <div className="app-root" data-theme={isDarkMode ? 'dark' : 'light'}>
+        <button
+          type="button"
+          className="theme-toggle auth-theme-toggle"
+          onClick={handleThemeToggle}
+          aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} theme`}
+          aria-pressed={isDarkMode}
+        >
+          {isDarkMode ? '☀️ Light' : '🌙 Dark'}
+        </button>
+        <div className="auth-wrapper">
+          <div className="auth-card">
+            <div className="auth-header">
+              <h1>🛍 Shopee Clone</h1>
+              <p>{isSignup ? 'Create your new account' : 'Log in to start shopping'}</p>
+            </div>
 
-          <form onSubmit={handleAuthSubmit} className="auth-form">
-            {isSignup && (
-              <>
-                <input
-                  className="auth-input"
-                  placeholder="Full Name"
-                  value={authData.name}
-                  onChange={(e) => setAuthData({ ...authData, name: e.target.value })}
-                  required
-                />
-                <select
-                  className="auth-input"
-                  value={authData.role}
-                  onChange={(e) => setAuthData({ ...authData, role: e.target.value })}
-                  aria-label="Account type"
-                >
-                  <option value="buyer">Buyer account</option>
-                  <option value="seller">Seller account</option>
-                </select>
-              </>
-            )}
+            <form onSubmit={handleAuthSubmit} className="auth-form">
+              {isSignup && (
+                <>
+                  <input
+                    className="auth-input"
+                    placeholder="Full Name"
+                    value={authData.name}
+                    onChange={(e) => setAuthData({ ...authData, name: e.target.value })}
+                    required
+                  />
+                  <select
+                    className="auth-input"
+                    value={authData.role}
+                    onChange={(e) => setAuthData({ ...authData, role: e.target.value })}
+                    aria-label="Account type"
+                  >
+                    <option value="buyer">Buyer account</option>
+                    <option value="seller">Seller account</option>
+                  </select>
+                </>
+              )}
 
-            <input
-              type="email"
-              className="auth-input"
-              placeholder="Email Address"
-              value={authData.email}
-              onChange={(e) => setAuthData({ ...authData, email: e.target.value })}
-              required
-            />
+              <input
+                type="email"
+                className="auth-input"
+                placeholder="Email Address"
+                value={authData.email}
+                onChange={(e) => setAuthData({ ...authData, email: e.target.value })}
+                required
+              />
 
-            <input
-              type="password"
-              className="auth-input"
-              placeholder="Password"
-              value={authData.password}
-              onChange={(e) => setAuthData({ ...authData, password: e.target.value })}
-              required
-            />
+              <input
+                type="password"
+                className="auth-input"
+                placeholder="Password"
+                value={authData.password}
+                onChange={(e) => setAuthData({ ...authData, password: e.target.value })}
+                required
+              />
 
-            <button type="submit" className="auth-button">
-              {isSignup ? 'Sign Up' : 'Log In'}
-            </button>
-          </form>
+              <button type="submit" className="auth-button">
+                {isSignup ? 'Sign Up' : 'Log In'}
+              </button>
+            </form>
 
-          <div className="auth-toggle-container">
-            <button onClick={() => setIsSignup(!isSignup)} className="auth-toggle-btn">
-              {isSignup ? 'Existing user? Log In' : 'New to Shopee? Sign Up'}
-            </button>
+            <div className="auth-toggle-container">
+              <button onClick={() => setIsSignup(!isSignup)} className="auth-toggle-btn">
+                {isSignup ? 'Existing user? Log In' : 'New to Shopee? Sign Up'}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -337,15 +358,26 @@ export default function App() {
   }
 
   return (
-    <div>
+    <div className="app-root" data-theme={isDarkMode ? 'dark' : 'light'}>
       <header className="shopee-header">
         <div className="header-container">
           <h2 className="brand-title" onClick={() => setActiveTab('shop')}>
             🛍️ <span>Shopee</span>
           </h2>
-          <div className="user-info">
-            <span>Welcome, <strong>{user?.name}</strong> ({user?.role})</span>
-            <button onClick={handleLogout} className="btn-logout">Logout</button>
+          <div className="header-actions">
+            <button
+              type="button"
+              className="theme-toggle"
+              onClick={handleThemeToggle}
+              aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} theme`}
+              aria-pressed={isDarkMode}
+            >
+              {isDarkMode ? '☀️ Light' : '🌙 Dark'}
+            </button>
+            <div className="user-info">
+              <span>Welcome, <strong>{user?.name}</strong> ({user?.role})</span>
+              <button onClick={handleLogout} className="btn-logout">Logout</button>
+            </div>
           </div>
         </div>
       </header>
