@@ -12,7 +12,8 @@
     "dev:frontend": "npm --prefix frontend run dev",
     "check:services": "node --check services/auth-service/server.js && node --check services/catalog-service/server.js && node --check services/order-service/server.js",
     "lint": "npm --prefix frontend run lint",
-    "build:frontend": "npm --prefix frontend run build"
+    "build:frontend": "npm --prefix frontend run build",
+    "test:ci": "npm run check:services && npm run lint && npm run build:frontend"
   },
   "devDependencies": {
     "concurrently": "^10.0.5"

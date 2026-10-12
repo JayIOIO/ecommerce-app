@@ -1,6 +1,8 @@
 # EcomApp — Feature-Stage Team Starter
 
-This is the team's e-commerce application for the System Architecture final project. It contains the buyer/seller storefront, authentication, catalog, order services, MySQL schema, and a Docker Compose deployment with an NGINX reverse proxy. Jenkins and the CI/CD pipeline are outside this repository's current infrastructure scope.
+This is the team's e-commerce application for the System Architecture final project. It contains the buyer/seller storefront, authentication, catalog, order services, MySQL schema, a Docker Compose deployment with an NGINX reverse proxy, and a separate Jenkins CI/CD stack.
+
+Final project reference: <https://github.com/JayIOIO/FinalProject-CI-CD-Automation>.
 
 The modules are separate source folders and share a MySQL database. For local feature work, the frontend calls the APIs through the Vite development proxy; for a containerized run, NGINX routes browser traffic to the frontend and APIs over a private Compose network.
 
@@ -21,7 +23,7 @@ The modules are separate source folders and share a MySQL database. For local fe
 - MySQL Server 8 or a compatible MySQL installation running locally.
 - MySQL Workbench is optional; it can be used to create the schema from `db/init.sql` for local development.
 
-Docker Desktop with Linux containers (or Docker Engine with Compose v2) is required only for the containerized run below. Jenkins is not part of the application Compose stack.
+Docker Desktop with Linux containers (or Docker Engine with Compose v2) is required for the containerized run and Jenkins pipeline below. Jenkins runs in a separate Compose project from the application.
 
 ## Run locally on Windows
 
@@ -120,15 +122,78 @@ npm run lint
 npm run build:frontend
 ```
 
-These checks validate backend JavaScript syntax and frontend lint/build. They are not a substitute for the integration tests the team should add in the later testing/automation phase.
-
-## Team collaboration: use this as the shared GitHub base
-
-The repository owner should create a new GitHub repository and push this starter as its initial baseline. Add collaborators, then have each teammate clone that same repository and branch from the shared default branch:
+The CI command used by Jenkins is:
 
 ```powershell
-git clone <NEW-GITHUB-REPOSITORY-URL>
-Set-Location <REPOSITORY-FOLDER>
+npm run test:ci
+```
+
+It validates backend JavaScript syntax and frontend lint/build. It is not a substitute for API assertion and end-to-end integration tests; those remain necessary before claiming core backend correctness.
+
+## Jenkins CI/CD
+
+Jenkins is an independent stack and shares the host's Linux Docker daemon with the application. Use Docker Desktop with Linux containers on Windows, or Docker Engine on Linux. The Jenkins container mounts `/var/run/docker.sock`; access to that socket grants control over the Docker host, so run this Jenkins instance only for trusted users and code. For smoke checks, Jenkins reaches the app's published proxy through `host.docker.internal`.
+
+### Start Jenkins and complete first-time setup
+
+The defaults require host TCP port `8081` for Jenkins and `50000` for inbound agents, if agents are used. The application proxy uses host port `8080` by default. Change `JENKINS_HTTP_PORT` or `JENKINS_AGENT_PORT` if either Jenkins port is occupied. If the application proxy port changes, update `PROXY_PORT` in the Jenkinsfile to the same host port.
+
+From the repository root in PowerShell:
+
+```powershell
+docker compose -p ecomapp-jenkins -f infra\jenkins\docker-compose.yml up -d --build
+docker compose -p ecomapp-jenkins -f infra\jenkins\docker-compose.yml exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+```
+
+Open <http://localhost:8081>, enter the one-time password printed by the second command, and finish the Jenkins setup wizard. The custom image preinstalls the **Pipeline**, **Pipeline Stage View**, **Git**, and **Credentials Binding** plugins. Create the first administrator using the wizard; do not put its password in this repository.
+
+`/var/jenkins_home` is stored in the named `ecomapp-jenkins_jenkins_home` volume. Stop/start or remove/recreate the Jenkins container without `-v` to preserve Jenkins configuration and job history:
+
+```powershell
+docker compose -p ecomapp-jenkins -f infra\jenkins\docker-compose.yml stop
+docker compose -p ecomapp-jenkins -f infra\jenkins\docker-compose.yml start
+```
+
+Do not use `docker compose down -v` unless deleting Jenkins history is intended.
+
+### Configure the pipeline job and secrets
+
+Create a **Pipeline** job, select **Pipeline script from SCM**, and enter:
+
+| Setting | Value |
+|---|---|
+| SCM | Git |
+| Repository URL | `https://github.com/JayIOIO/FinalProject-CI-CD-Automation.git` |
+| Branch specifier | `*/main` (the reference repository's default branch) |
+| Script path | `Jenkinsfile` |
+
+The selected trigger is the Jenkinsfile's **Poll SCM**, schedule `H/5 * * * *` (Jenkins checks approximately every five minutes). Do not also enable a GitHub webhook unless the team deliberately changes the trigger and updates this documentation. Polling requires the Jenkins job to be configured from SCM and to have completed its initial setup/build.
+
+Before a deployment build, add these **Secret text** credentials under **Manage Jenkins → Credentials → System → Global credentials**. Use the IDs exactly as listed; enter private values directly in Jenkins and never commit or print them:
+
+| Credential ID | Purpose |
+|---|---|
+| `ecommerce-db-password` | Application MySQL user password (`COMPOSE_DB_PASSWORD`) |
+| `ecommerce-mysql-root-password` | MySQL root password |
+| `ecommerce-jwt-secret` | Application JWT signing secret |
+
+The pipeline uses only these credential IDs. `COMPOSE_DB_USER` is a non-secret pipeline setting. On Linux hosts where the Docker socket group is not GID `0`, set `DOCKER_GID` to the socket's group ID when starting Jenkins; the Compose service adds that group to the Jenkins process.
+
+### Builds, deployment gate, and rollback
+
+The stages run in order: **Checkout → Test → Image Build → Deploy → Smoke / Verify**. `Test` runs the same `npm run test:ci` command documented above. Declarative pipeline failure handling stops later stages after a failed test. Image build tags all six app images with the Jenkins `BUILD_NUMBER`; the proxy's `GET /version` endpoint returns the deployed tag.
+
+Leave the `ROLLBACK_BUILD` parameter empty for a normal build. To roll back, enter the number of an earlier successful build whose tagged images are still present on this same Docker daemon. The pipeline skips Image Build, verifies that all six tagged images exist, redeploys them, then checks both `/version` and `/api/products` through the proxy. Rollback restores application images only; it does not roll back database contents or schema.
+
+The pipeline can deploy only from `main`; other branches still check out and run tests but do not deploy. To run the deliberate failing-test case on an approved test branch, use a separate Pipeline-from-SCM job for that branch or a multibranch job; do not change the production job's `main` deployment gate. The Jenkins job's initial setup build, automatic poll-triggered run after a reviewed change, failing-test demonstration, previous-version rollback, and teammate reviews must be completed and recorded by the team; they cannot be evidenced by the repository configuration alone.
+
+## Team collaboration: use the shared GitHub repository
+
+Use the [Final Project CI/CD Automation repository](https://github.com/JayIOIO/FinalProject-CI-CD-Automation) as the shared project repository. Add collaborators there, then have each teammate clone it and branch from its `main` default branch:
+
+```powershell
+git clone https://github.com/JayIOIO/FinalProject-CI-CD-Automation.git
+Set-Location FinalProject-CI-CD-Automation
 git switch main
 git pull
 git switch -c <role-or-task-branch>
