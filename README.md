@@ -1,6 +1,6 @@
 # EcomApp — Feature-Stage Team Starter
 
-This is the team's application-feature baseline for the System Architecture final project. It contains the buyer/seller storefront, authentication, catalog, order services, and MySQL schema. It is deliberately prepared **before the infrastructure/automation phase**: there is no Docker/Compose setup, NGINX deployment proxy, Jenkins configuration, CI pipeline, or cross-service integration smoke-test suite in this starter.
+This is the team's application-feature baseline for the System Architecture final project. It contains the buyer/seller storefront, authentication, catalog, order services, and MySQL schema. It is deliberately prepared **before the infrastructure/automation phase**: there is no Docker/Compose setup, NGINX deployment proxy, Jenkins configuration, or CI-integrated smoke-test stage in this checkout. A local disposable-data integration smoke test is available as `npm run test:smoke`.
 
 The modules are separate source folders, but they share the local MySQL database and the frontend calls their APIs through the Vite development proxy. This lets teammates work on module changes against a runnable baseline. Add and review the missing infrastructure, integration tests, and automation as subsequent team contributions.
 
@@ -89,7 +89,19 @@ npm run lint
 npm run build:frontend
 ```
 
-These checks validate backend JavaScript syntax and frontend lint/build. They are not a substitute for the integration tests the team should add in the later testing/automation phase.
+These checks validate backend JavaScript syntax and frontend lint/build. The separate local integration smoke test is documented below; none of these checks is currently wired into a CI pipeline in this checkout.
+
+## Local integration smoke test
+
+With the three APIs and the disposable MySQL database configured by `.env` already running, execute:
+
+```powershell
+npm run test:smoke
+```
+
+The test creates uniquely named buyer/seller accounts and one product, checks public search, buyer checkout, seller order visibility and fulfillment, and verifies the delivered buyer history. Every scenario prints a `PASS` line; any failed assertion or HTTP response fails the process with exit code 1. A database connection is verified before test data is created. In a `finally` cleanup transaction, it deletes only that run's buyer-owned orders, seller-owned product by its returned ID and unique name, and the user IDs returned by the two signups. Cleanup failures also fail the command.
+
+**Run this only against a disposable local/test database that the configured database user can clean.** It directly removes its generated test rows as part of teardown and is not intended for production, shared, or instructor-demo data. Optional API URL overrides are `SMOKE_AUTH_URL`, `SMOKE_CATALOG_URL`, and `SMOKE_ORDERS_URL`; they must point at services using the same configured disposable MySQL database. `SMOKE_EMAIL_DOMAIN` can change the unique test-email domain if `example.test` is not accepted by a test deployment.
 
 ## Frontend build identifier
 
@@ -106,7 +118,7 @@ Only use `git rev-parse --short HEAD` as the label when the build is from a clea
 
 ## Frontend QA and submission-document drafts
 
-The current manual UI observations and unrun scenarios are recorded in [the QA checklist](docs/qa-checklist.md). Only scenarios actually exercised may be marked passed. The technical-document page plan is in [the technical document outline](docs/technical-document-outline.md), and the 15-slide presentation draft is [available as an HTML slide deck](docs/ash-project-deck.html). These drafts distinguish this feature-stage starter from the final Docker/Compose/Jenkins deployment; replace planned/demo placeholders with verified team evidence before submission.
+The local UI run, outcomes, and remaining final-proxy validation are recorded in [the QA checklist](docs/qa-checklist.md) and its [dated execution log](docs/evidence/frontend-qa-run-2026-10-13.md). The [build-label screenshots](docs/evidence/) show a local QA identifier, not a deployed release. The technical report is [available as a 10-page PDF](docs/ecomapp-technical-report.pdf) with [HTML source](docs/technical-report.html); the 15-slide presentation is [available as an interactive HTML deck](docs/ash-project-deck.html) and [PDF](docs/ecomapp-presentation.pdf). The report/deck describe the verified feature-stage checkout and explicitly mark final deployment/pipeline/persistence/rollback evidence as outstanding.
 
 ## Team collaboration: use this as the shared GitHub base
 

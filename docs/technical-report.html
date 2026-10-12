@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EcomApp Technical Report — Feature Baseline and Frontend QA</title>
+    <style>
+      @page { size: A4; margin: 0; }
+      :root {
+        font-family: "Segoe UI", Arial, sans-serif;
+        color: #172237;
+        font-size: 10pt;
+        line-height: 1.42;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: #eef1f6; }
+      .page {
+        position: relative;
+        width: 210mm;
+        height: 297mm;
+        margin: 12mm auto;
+        padding: 20mm 20mm 18mm;
+        overflow: hidden;
+        background: white;
+        box-shadow: 0 2px 12px #15213b25;
+        break-after: page;
+        page-break-after: always;
+      }
+      .page:last-child { break-after: auto; page-break-after: auto; }
+      .eyebrow { color: #e64e2f; font-size: 8pt; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
+      h1 { font-size: 36pt; line-height: 1.02; letter-spacing: -.04em; margin: 20mm 0 5mm; color: #172237; }
+      h2 { font-size: 22pt; line-height: 1.08; letter-spacing: -.025em; margin: 0 0 8mm; color: #172237; }
+      h3 { font-size: 12pt; margin: 5mm 0 2mm; color: #203653; }
+      p { margin: 0 0 3mm; }
+      ul, ol { margin: 2mm 0 4mm; padding-left: 6mm; }
+      li { margin: 1.3mm 0; }
+      table { width: 100%; border-collapse: collapse; margin: 3mm 0 5mm; font-size: 8.7pt; }
+      th { background: #203653; color: white; text-align: left; }
+      th, td { border: 1px solid #d4dce8; padding: 2.1mm; vertical-align: top; }
+      .muted { color: #526176; }
+      .small { font-size: 8.5pt; }
+      .callout { border-left: 3px solid #e64e2f; background: #fff3ef; padding: 3mm 4mm; margin: 4mm 0; }
+      .panel { border: 1px solid #d4dce8; border-radius: 2mm; padding: 4mm; margin: 3mm 0; }
+      .flow { font-family: Consolas, "Courier New", monospace; font-size: 9pt; line-height: 1.65; white-space: pre-wrap; background: #f3f6fa; padding: 4mm; border: 1px solid #d4dce8; }
+      .footer { position: absolute; bottom: 9mm; left: 20mm; right: 20mm; display: flex; justify-content: space-between; color: #718096; font-size: 8pt; border-top: 1px solid #e1e6ee; padding-top: 2mm; }
+      .cover-band { width: 22mm; height: 3mm; margin-top: 15mm; background: #e64e2f; }
+      .cover-meta { margin-top: 30mm; border-top: 1px solid #d4dce8; padding-top: 5mm; }
+      .tag { display: inline-block; border: 1px solid #e64e2f; color: #b53f28; border-radius: 99px; padding: 1mm 3mm; font-size: 8pt; font-weight: 700; }
+      .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; }
+      a { color: #b53f28; }
+      @media screen {
+        .page { min-height: 297mm; }
+      }
+      @media print {
+        body { background: white; }
+        .page { margin: 0; box-shadow: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <section class="page">
+      <span class="eyebrow">System Architecture · Technical documentation</span>
+      <div class="cover-band"></div>
+      <h1>EcomApp</h1>
+      <h2>Feature Baseline &amp;<br />Frontend QA Report</h2>
+      <p class="muted" style="font-size: 14pt; max-width: 145mm">Evidence-based technical report for the current local feature checkout and Ash's frontend QA contribution.</p>
+      <div style="margin-top: 12mm"><span class="tag">Verified scope: local feature stage</span></div>
+      <div class="cover-meta">
+        <p><strong>Project repository:</strong> <a href="https://github.com/JayIOIO/FinalProject-CI-CD-Automation">JayIOIO/FinalProject-CI-CD-Automation</a> (reference repository)</p>
+        <p><strong>Working branch:</strong> <code>feature/frontend-build-label</code></p>
+        <p><strong>Report date:</strong> 2026-10-13</p>
+        <p><strong>Named team roles:</strong> Salenga (project lead), Riboroso (backend and CI/CD), Tato (infrastructure), Ash (frontend, QA, documentation)</p>
+        <p><strong>Roster note:</strong> Supplied course guide requires five distinct members; the fifth member's name was not provided. This report does not invent one.</p>
+      </div>
+      <div class="callout" style="margin-top: 12mm"><strong>Scope and status.</strong> This is not the final deployment report. The checkout has the feature-stage application and local services; it has no team Docker/Compose, deployment proxy configuration, Jenkins pipeline, or integrated smoke-test suite. Final proxy and release evidence must be added by the team.</div>
+      <div class="footer"><span>EcomApp · local feature-stage evidence</span><span>1 / 10</span></div>
+    </section>
+
+    <section class="page">
+      <span class="eyebrow">01 · Executive summary</span>
+      <h2>Purpose, scope, and claims</h2>
+      <p>EcomApp is a marketplace demonstration with buyer and seller experiences backed by separate authentication, product catalog, and order services. The frontend is React with Vite; the APIs are Node.js/Express; data is stored in MySQL. The local feature-stage starter provides the core application modules and a Vite development proxy.</p>
+      <p>Ash's contribution on this branch supplies a truthful, visible frontend build identifier, build instructions, a manually exercised frontend QA checklist, safe local screenshots, an initial disposable-data integration smoke test, this technical report, and a 15-slide HTML presentation. The UI reads <code>VITE_BUILD_ID</code> at bundle-build time. If unset, it displays “unlabeled build” rather than asserting a false deployment version.</p>
+      <h3>Verified in the local environment</h3>
+      <ul>
+        <li>All 15 scenarios in the dated frontend checklist were exercised against the local Vite proxy and local APIs using disposable data.</li>
+        <li>Buyer and seller registration/login, catalog search, cart, checkout, order history/cancellation, listing create/edit/delete, seller order view, and fulfillment progression were observed.</li>
+        <li>Buyer UI omitted seller navigation; buyer requests to seller-only APIs returned the expected HTTP 403; buyer order history returned HTTP 200.</li>
+        <li>Frontend lint, frontend production build, backend JavaScript syntax checks, and the local API/database integration smoke test passed on 2026-10-13.</li>
+        <li>All disposable QA users, order data, and products were removed after the run. No passwords or bearer tokens were committed.</li>
+      </ul>
+      <h3>Not verified here</h3>
+      <ul>
+        <li>Operation through the final team reverse proxy. Port 80 responds with a site, but its tested application API routes return 404; HTTPS also presents an untrusted certificate locally.</li>
+        <li>Docker/Compose image build/deploy, Jenkins trigger or quality gate, named-volume persistence, rollback, and CI wiring/review of the local smoke test.</li>
+        <li>A clean-clone README walkthrough by an unfamiliar teammate, a confirmed five-person roster, or merged/pushed status of the current uncommitted documentation changes.</li>
+      </ul>
+      <div class="callout">This report separates observed behavior from project requirements and planned work. “Not verified” is not a pass.</div>
+      <div class="footer"><span>EcomApp · scope is intentionally limited</span><span>2 / 10</span></div>
+    </section>
+
+    <section class="page">
+      <span class="eyebrow">02 · Application architecture</span>
+      <h2>Local feature-stage topology</h2>
+      <div class="flow">Browser
+  |
+  v
+React / Vite development server :5173
+  |-- /api/auth/*     -> auth service   :4001
+  |-- /api/products*  -> catalog service:4002
+  `-- /api/orders*    -> order service  :4003
+                            |
+                            v
+                    Local MySQL :3306</div>
+      <p class="small muted">Ports and routes above are from the checked-in local Vite configuration and service configuration. MySQL is an external local prerequisite, not a process started by the root dev script.</p>
+      <h3>Request responsibilities</h3>
+      <table>
+        <thead><tr><th>Component</th><th>Observed responsibility</th><th>Local interface</th></tr></thead>
+        <tbody>
+          <tr><td>React frontend</td><td>Authentication forms; buyer search/cart/checkout/history; seller inventory/order views; build ID label</td><td>Vite local server :5173</td></tr>
+          <tr><td>Auth service</td><td>Buyer/seller signup and login, signed token issuance, authenticated profile update</td><td><code>/api/auth/*</code> via :4001</td></tr>
+          <tr><td>Catalog service</td><td>Public product search and seller-owned inventory mutations</td><td><code>/api/products*</code> via :4002</td></tr>
+          <tr><td>Order service</td><td>Buyer checkout/history/cancellation and seller order/fulfillment access</td><td><code>/api/orders*</code> via :4003</td></tr>
+          <tr><td>MySQL</td><td>Relational storage for users, products, checkout orders, and order items</td><td>Local connection from service configuration</td></tr>
+        </tbody>
+      </table>
+      <h3>Target topology is a separate phase</h3>
+      <p>The course reference project describes a containerized target with a public NGINX proxy, application containers, persistent MySQL volume, and Jenkins in a separate Compose stack. Those files and runtime evidence are not in this working checkout and are not represented as implemented here.</p>
+      <div class="footer"><span>Source: frontend/vite.config.js, service entry points, README</span><span>3 / 10</span></div>
+    </section>
+
+    <section class="page">
+      <span class="eyebrow">03 · Modules and role contracts</span>
+      <h2>Buyer, seller, and service boundaries</h2>
+      <div class="two-col">
+        <div class="panel">
+          <h3>Buyer workflow</h3>
+          <ol>
+            <li>Register or log in with buyer role.</li>
+            <li>Search the public catalog; add products to cart.</li>
+            <li>Provide shipping address/payment choice and place an order.</li>
+            <li>Review order details/status and cancel eligible Pending orders.</li>
+          </ol>
+        </div>
+        <div class="panel">
+          <h3>Seller workflow</h3>
+          <ol>
+            <li>Register or log in with seller role.</li>
+            <li>Create, edit, view, and delete seller-owned listings.</li>
+            <li>View orders containing owned products.</li>
+            <li>Advance eligible item fulfillment to Processing, Shipped, Delivered.</li>
+          </ol>
+        </div>
+      </div>
+      <h3>Role enforcement observed</h3>
+      <p>Frontend navigation and seller screens are conditional on the signed-in role. That presentation guard complements, but does not replace, backend authorization. In the local test a buyer's authenticated requests to <code>GET /api/products/mine</code> and <code>GET /api/orders/seller</code> returned HTTP 403. Buyer order history returned HTTP 200.</p>
+      <h3>Data integrity paths</h3>
+      <p>The checkout test created an order from selected products and quantities; the buyer could read the order and the owning seller could see the item. Seller fulfillment changed the item status through Processing, Shipped, and Delivered, which then appeared in buyer history. A separate Pending order was cancelled through the UI. These are observed local application behaviors, not a substitute for a formal API contract or cross-service automated test.</p>
+      <div class="callout">Real test-account identifiers and synthetic shipping details are intentionally omitted from this report. The private session note stores identifiers for QA traceability only.</div>
+      <div class="footer"><span>Source: local UI execution record and API role checks</span><span>4 / 10</span></div>
+    </section>
+
+    <section class="page">
+      <span class="eyebrow">04 · Technology and data</span>
+      <h2>Stack rationale and persistence boundaries</h2>
+      <table>
+        <thead><tr><th>Technology</th><th>Use in current checkout</th><th>Reason tied to this application</th></tr></thead>
+        <tbody>
+          <tr><td>React</td><td>Buyer and seller single-page UI</td><td>Composable role-aware screens and local state for cart/forms.</td></tr>
+          <tr><td>Vite</td><td>Frontend development/build tool and local `/api` proxy</td><td>Serves the UI locally and routes service prefixes to separate API processes.</td></tr>
+          <tr><td>Node.js / Express</td><td>Three separate HTTP APIs</td><td>Keeps authentication, catalog, and order responsibilities distinct.</td></tr>
+          <tr><td>MySQL</td><td>Shared relational persistence</td><td>Foreign keys model users, seller products, orders, and order items.</td></tr>
+          <tr><td>JWT</td><td>Authenticated role-bearing requests</td><td>Allows protected catalog/order routes to distinguish buyer and seller capabilities.</td></tr>
+        </tbody>
+      </table>
+      <h3>Data model (checked-in schema)</h3>
+      <p><code>users</code> own products and buyer orders. <code>products.seller_id</code> relates inventory to a seller. <code>checkout_orders.user_id</code> relates a checkout to its buyer; <code>order_items</code> connects each order to products and seller ownership. Foreign keys constrain references; order items cascade with their parent order, while product deletion is restricted when referenced by order history.</p>
+      <h3>Configuration and persistence</h3>
+      <p>Services load local environment configuration from the repository-root `.env`, connect to a local MySQL instance, and use the checked-in initialization SQL for schema/seed setup. The root `npm run dev` starts application processes only; it does not start MySQL. `.env` is private and must not be committed.</p>
+      <p>A persistent named Docker volume, container restart proof, migration path, and rollback persistence behavior are course requirements for a later integrated phase. None was exercised by this feature-stage checkout.</p>
+      <div class="footer"><span>Source: db/init.sql, service configuration, README</span><span>5 / 10</span></div>
+    </section>
+
+    <section class="page">
+      <span class="eyebrow">05 · Setup and quality checks</span>
+      <h2>Reproducing this local stage</h2>
+      <ol>
+        <li>Install Git, Node.js 22 LTS (or compatible current Node), npm, and local MySQL.</li>
+        <li>Copy `.env.example` to `.env`; set local DB values and a private JWT secret.</li>
+        <li>Initialize the schema using `db/init.sql` against the configured MySQL instance.</li>
+        <li>Run <code>npm run setup</code>, then <code>npm run dev</code>.</li>
+        <li>Open the frontend and use synthetic, unique buyer/seller accounts.</li>
+      </ol>
+      <h3>Checks actually run for this work</h3>
+      <table>
+        <thead><tr><th>Command</th><th>Result</th><th>Meaning / limitation</th></tr></thead>
+        <tbody>
+          <tr><td><code>npm run lint</code></td><td>Passed, 2026-10-13</td><td>Frontend source lint; not backend behavior.</td></tr>
+          <tr><td><code>npm run build:frontend</code></td><td>Passed, 2026-10-13</td><td>Vite production bundle built successfully.</td></tr>
+          <tr><td><code>npm run check:services</code></td><td>Passed, 2026-10-13</td><td>Node syntax checks for three service entry points; not service tests.</td></tr>
+          <tr><td>Manual buyer/seller QA</td><td>15/15 scenarios passed locally</td><td>See checklist and dated execution record; not final proxy QA.</td></tr>
+          <tr><td>Cross-service smoke test</td><td><code>npm run test:smoke</code> creates unique buyer/seller/product data, checks search, checkout, fulfillment and buyer history, asserts results, and transactionally cleans up. Happy path passed; unavailable order API correctly failed nonzero and cleaned up.</td><td>Local pass/fail behavior verified; backend-owner review and CI wiring outstanding</td></tr>
+        </tbody>
+      </table>
+      <h3>Clean-clone documentation check</h3>
+      <p>The README includes local feature setup and troubleshooting. A fresh-clone walkthrough by a teammate unfamiliar with the system has not been recorded, so documentation usability is not claimed as independently validated.</p>
+      <div class="footer"><span>Source: package scripts and actual command results</span><span>6 / 10</span></div>
+    </section>
+
+    <section class="page">
+      <span class="eyebrow">06 · Frontend QA results</span>
+      <h2>Local browser scenarios</h2>
+      <p>Run on 2026-10-13 in Chromium through the VS Code integrated browser. The UI was at <code>http://localhost:5173/</code>; Vite proxied API calls to local services. Service health endpoints returned HTTP 200. Test identities/products were synthetic, disposable, and removed after the run.</p>
+      <table>
+        <thead><tr><th>Area</th><th>Verified observation</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Buyer auth</td><td>Buyer signup and subsequent login worked; buyer-only navigation appeared.</td><td>Pass</td></tr>
+          <tr><td>Public search</td><td>Keyword/category filter `Mechanical` / `Electronics` returned Mechanical Keyboard and excluded Smart Watch.</td><td>Pass</td></tr>
+          <tr><td>Cart</td><td>Quantity 2 updated keyboard total to $159.98; remove-item state and post-checkout empty cart were observed.</td><td>Pass</td></tr>
+          <tr><td>Checkout/history</td><td>Order was created with synthetic shipping/payment data and rendered in buyer history with amount, item, and status.</td><td>Pass</td></tr>
+          <tr><td>Cancellation</td><td>Separate Pending order cancelled; it disappeared from buyer history.</td><td>Pass</td></tr>
+          <tr><td>Seller auth/listings</td><td>Seller signup/login and listing create/edit/delete passed; edits appeared in inventory.</td><td>Pass</td></tr>
+          <tr><td>Seller orders</td><td>Seller saw an order for its product and updated item status through Processing, Shipped, Delivered.</td><td>Pass</td></tr>
+          <tr><td>Role boundary</td><td>Buyer UI omitted seller navigation; buyer API requests to seller-only endpoints returned expected 403.</td><td>Pass</td></tr>
+        </tbody>
+      </table>
+      <div class="callout">The “15/15” count includes separate UI scenarios for signup/login, cart actions, listing mutations, order view/statuses, and buyer role navigation/API restrictions. Exact actions and results are in <code>docs/qa-checklist.md</code>.</div>
+      <p>Redacted screenshots document the local build identifier in the login and signed-in header. Workflow outcomes are recorded in <code>docs/evidence/frontend-qa-run-2026-10-13.md</code>; workflow screenshots were not captured.</p>
+      <div class="footer"><span>Source: dated manual QA; local only</span><span>7 / 10</span></div>
+    </section>
+
+    <section class="page">
+      <span class="eyebrow">07 · Build identity and evidence</span>
+      <h2>Version label tied to the bundle source</h2>
+      <p>The sign-in screen and authenticated header display <code>VITE_BUILD_ID</code>, compiled by Vite into the frontend bundle. An unset value renders “unlabeled build.” This avoids embedding an unsupported number or release claim into the UI.</p>
+      <h3>Reproducible local build-label check</h3>
+      <div class="flow">$env:VITE_BUILD_ID = 'local-qa-20261013'
+npm run build:frontend
+npm --prefix frontend run preview -- --host localhost --port 4173
+# Open http://localhost:4173 and inspect the login screen</div>
+      <p>The `local-qa-20261013` label was visually checked in both sign-in and signed-in screens; screenshots are included in the evidence folder. The disposable account used for the authenticated screenshot was deleted after capture.</p>
+      <h3>Release pipeline hand-off</h3>
+      <ul>
+        <li>CI must pass the immutable checked-out commit or release identifier as <code>VITE_BUILD_ID</code> before frontend image compilation.</li>
+        <li>A runtime environment change cannot modify an already built static bundle.</li>
+        <li>Do not use a manually selected build number or use <code>HEAD</code> as a claim when uncommitted changes are in the image.</li>
+        <li>After merge/deploy, verify the browser label through the final proxy against the actual image/commit used by CI.</li>
+      </ul>
+      <h3>Safe evidence inventory</h3>
+      <ul>
+        <li><code>docs/evidence/frontend-build-label-login.png</code> — local QA label at sign-in.</li>
+        <li><code>docs/evidence/frontend-build-label-signed-in.png</code> — local QA label in signed-in buyer header with synthetic display name.</li>
+        <li><code>docs/evidence/frontend-qa-run-2026-10-13.md</code> — sanitized scenario outcomes and scope caveats.</li>
+      </ul>
+      <div class="footer"><span>Source: built bundle and observed local browser UI</span><span>8 / 10</span></div>
+    </section>
+
+    <section class="page">
+      <span class="eyebrow">08 · Integration status</span>
+      <h2>What the final delivery still needs</h2>
+      <table>
+        <thead><tr><th>Requirement</th><th>Current evidence</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Final reverse proxy `/` + `/api/...`</td><td>Port 80 returned an HTML site; `/api/auth/health`, `/api/products`, and `/api/orders/health` returned 404. Local HTTPS certificate was untrusted.</td><td>Not verified / blocker</td></tr>
+          <tr><td>Dockerfiles and app Compose</td><td>No Dockerfiles or Compose file present in this checkout; Docker container inventory did not complete due daemon/tool unavailability.</td><td>Not in checkout</td></tr>
+          <tr><td>Jenkins / automatic SCM trigger</td><td>No Jenkinsfile or Jenkins Compose stack present in this checkout.</td><td>Not in checkout</td></tr>
+          <tr><td>Cross-service smoke test</td><td>Local CLI flow happy/failure paths passed against local services/database; it is not wired into CI.</td><td>Local pass/fail behavior; review/CI pending</td></tr>
+          <tr><td>Named-volume persistence</td><td>No container volume restart/read-back test run.</td><td>Not run</td></tr>
+          <tr><td>Rollback proof</td><td>No tested previous image/tag or deployment run available here.</td><td>Not run</td></tr>
+          <tr><td>Final team roster</td><td>Four named people appear in supplied role assignments; assignment requires a fifth distinct member.</td><td>Confirmation required</td></tr>
+        </tbody>
+      </table>
+      <h3>Recommended team hand-offs</h3>
+      <ol>
+        <li>Tato: publish the merged proxy URL/port and the valid local certificate/trust path; retest all `/api/...` prefixes.</li>
+        <li>Riboroso: review the local smoke-test contract/cleanup and wire it into the intended isolated CI test stage.</li>
+        <li>Riboroso/Tato: supply real CI run, failure gate, database volume persistence, and rollback evidence.</li>
+        <li>Salenga: confirm the fifth member and align the final roster/contributions/slides.</li>
+        <li>Ash: repeat UI checklist through the final proxy and replace local-only evidence with sanitized final-proxy evidence.</li>
+      </ol>
+      <div class="footer"><span>Scope check performed 2026-10-13; this is the feature-stage checkout</span><span>9 / 10</span></div>
+    </section>
+
+    <section class="page">
+      <span class="eyebrow">09 · Conclusions and references</span>
+      <h2>Evidence-backed conclusion</h2>
+      <p>The current local feature-stage application supports the tested buyer and seller UI journeys. The build label is sourced from a build-time environment value and was confirmed in a local production preview; local lint/build/service syntax checks pass. Disposable QA data was removed, and no test credentials were included in the repository.</p>
+      <p>This evidence does not establish deployment readiness. The final reverse proxy route set, container orchestration, Jenkins-triggered pipeline, CI integration smoke stage, persistent-volume proof, and rollback run remain outside this checkout or unverified. The final submission narrative should be updated only when owners provide actual merged configuration and dated run results.</p>
+      <h3>Project references</h3>
+      <ol class="small">
+        <li>Team reference repository: <a href="https://github.com/JayIOIO/FinalProject-CI-CD-Automation">https://github.com/JayIOIO/FinalProject-CI-CD-Automation</a>.</li>
+        <li>Local project setup: <code>README.md</code>.</li>
+        <li>Source schema: <code>db/init.sql</code>; service routes: <code>services/auth-service/server.js</code>, <code>services/catalog-service/server.js</code>, <code>services/order-service/server.js</code>.</li>
+        <li>Frontend implementation and route proxy: <code>frontend/src/App.jsx</code>, <code>frontend/vite.config.js</code>.</li>
+        <li>Manual results: <code>docs/qa-checklist.md</code> and <code>docs/evidence/frontend-qa-run-2026-10-13.md</code>.</li>
+        <li>Course-role and release-gate instructions: supplied Team Execution Guide, sections on Ash's frontend QA, issue workflow, release gates, and technical deliverables.</li>
+      </ol>
+      <h3>Submission checks before calling the course project complete</h3>
+      <ul>
+        <li>Confirm the real five-person roster and complete clean-clone instructions.</li>
+        <li>Run and archive final-proxy buyer/seller QA, successful/failed pipeline, volume persistence, and rollback evidence.</li>
+        <li>Update the slide deck and report with team-supplied actual outcomes; retain all caveats that remain true.</li>
+      </ul>
+      <span class="tag">This report contains no passwords, bearer tokens, or private environment values.</span>
+      <div class="footer"><span>EcomApp · technical report · 2026-10-13</span><span>10 / 10</span></div>
+    </section>
+  </body>
+</html>
