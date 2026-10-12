@@ -3,17 +3,17 @@ const mysql = require('mysql2/promise');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
+require('dotenv').config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 const pool = mysql.createPool({
-  host: process.env.DB_HOST || '127.0.0.1',
+  host: process.env.DB_HOST || 'db',
   port: process.env.DB_PORT || 3306,
   user: process.env.DB_USER || 'app_user',
-  password: process.env.DB_PASSWORD ?? 'app_password',
+  password: process.env.DB_PASSWORD || 'app_password',
   database: process.env.DB_NAME || 'ecommerce_db',
   waitForConnections: true,
   connectionLimit: 10
@@ -119,7 +119,7 @@ app.put('/api/auth/profile', authenticateToken, async (req, res) => {
   }
 });
 
-const PORT = Number(process.env.PORT || process.env.AUTH_PORT || 4001);
+const PORT = Number(process.env.PORT || 4001);
 app.listen(PORT, () => {
   console.log(`Auth service running on http://localhost:${PORT}`);
 });
