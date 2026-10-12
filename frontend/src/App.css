@@ -99,6 +99,34 @@ body {
   color: var(--text-muted);
 }
 
+.auth-password-field {
+  position: relative;
+}
+
+.auth-password-input {
+  width: 100%;
+  padding-right: 64px;
+}
+
+.auth-password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  padding: 4px;
+  border: 0;
+  background: transparent;
+  color: #ee4d2d;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-password-toggle:focus-visible {
+  outline: 2px solid #ee4d2d;
+  outline-offset: 2px;
+}
+
 .auth-button {
   padding: 12px;
   background-color: #ee4d2d;

@@ -16,6 +16,7 @@ export default function App() {
     }
   });
   const [isSignup, setIsSignup] = useState(false);
+  const [showAuthPassword, setShowAuthPassword] = useState(false);
   const [activeTab, setActiveTab] = useState('shop');
   const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
 
@@ -285,20 +286,21 @@ export default function App() {
   if (!token) {
     return (
       <div className="app-root" data-theme={isDarkMode ? 'dark' : 'light'}>
-      
- 
-      {/*
+        {/*
+          
         <button
-            type="button"
-            className="theme-toggle auth-theme-toggle"
-            onClick={handleThemeToggle}
-            aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} theme`}
-            aria-pressed={isDarkMode}
-          >
-            {isDarkMode ? '☀️ Light' : '🌙 Dark'}
-          </button>
-      */} 
+          type="button"
+          className="theme-toggle auth-theme-toggle"
+          onClick={handleThemeToggle}
+          aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} theme`}
+          aria-pressed={isDarkMode}
+        >
+          {isDarkMode ? '☀️ Light' : '🌙 Dark'}
+        </button>
+        
+        */}
 
+      
 
         <div className="auth-wrapper">
           <div className="auth-card">
@@ -338,14 +340,26 @@ export default function App() {
                 required
               />
 
-              <input
-                type="password"
-                className="auth-input"
-                placeholder="Password"
-                value={authData.password}
-                onChange={(e) => setAuthData({ ...authData, password: e.target.value })}
-                required
-              />
+              <div className="auth-password-field">
+                <input
+                  type={showAuthPassword ? 'text' : 'password'}
+                  className="auth-input auth-password-input"
+                  placeholder="Password"
+                  value={authData.password}
+                  onChange={(e) => setAuthData({ ...authData, password: e.target.value })}
+                  autoComplete={isSignup ? 'new-password' : 'current-password'}
+                  required
+                />
+                <button
+                  type="button"
+                  className="auth-password-toggle"
+                  onClick={() => setShowAuthPassword((isVisible) => !isVisible)}
+                  aria-label={showAuthPassword ? 'Hide password' : 'Show password'}
+                  aria-pressed={showAuthPassword}
+                >
+                  {showAuthPassword ? 'Hide' : 'Show'}
+                </button>
+              </div>
 
               <button type="submit" className="auth-button">
                 {isSignup ? 'Sign Up' : 'Log In'}
