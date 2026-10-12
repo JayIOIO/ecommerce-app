@@ -54,7 +54,6 @@ pipeline {
         sh 'npm ci --prefix services/order-service'
         sh 'npm ci --prefix frontend'
         sh 'npm run test:ci'
-        sh 'node -e "process.exit(1)"'
       }
     }
 
