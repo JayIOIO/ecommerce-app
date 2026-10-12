@@ -286,8 +286,7 @@ export default function App() {
   if (!token) {
     return (
       <div className="app-root" data-theme={isDarkMode ? 'dark' : 'light'}>
-        {/*
-          
+      
         <button
           type="button"
           className="theme-toggle auth-theme-toggle"
@@ -297,11 +296,7 @@ export default function App() {
         >
           {isDarkMode ? '☀️ Light' : '🌙 Dark'}
         </button>
-        
-        */}
-
       
-
         <div className="auth-wrapper">
           <div className="auth-card">
             <div className="auth-header">

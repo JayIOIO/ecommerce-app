@@ -5,12 +5,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-const 213sadqwa = sad\\..1;
-const 213sadqwa = sad\\..1;
-
-const 213sadqwa = sad\\..1;
-badcode
-
 const app = express();
 app.use(cors());
 app.use(express.json());
