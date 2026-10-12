@@ -2,17 +2,17 @@ const express = require('express');
 const mysql = require('mysql2/promise');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
-require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
+require('dotenv').config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 const pool = mysql.createPool({
-  host: process.env.DB_HOST || '127.0.0.1',
+  host: process.env.DB_HOST || 'db',
   port: process.env.DB_PORT || 3306,
   user: process.env.DB_USER || 'app_user',
-  password: process.env.DB_PASSWORD ?? 'app_password',
+  password: process.env.DB_PASSWORD || 'app_password',
   database: process.env.DB_NAME || 'ecommerce_db',
   waitForConnections: true,
   connectionLimit: 10
@@ -164,7 +164,7 @@ app.delete('/api/products/:id', authenticateToken, requireSeller, async (req, re
   }
 });
 
-const PORT = Number(process.env.PORT || process.env.CATALOG_PORT || 4002);
+const PORT = Number(process.env.PORT || 4002);
 app.listen(PORT, () => {
   console.log(`Catalog service running on http://localhost:${PORT}`);
 });
