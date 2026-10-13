@@ -1,7 +1,11 @@
+# Start from Jenkins with the Java runtime required by Jenkins itself.
 FROM jenkins/jenkins:lts-jdk21
 
+# Install system tools as root, then return to Jenkins' unprivileged account.
 USER root
 
+# Add Docker CLI/Compose for pipeline deployment and Node.js for project checks.
+# Repository signing keys verify packages from Docker and NodeSource.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates curl gnupg \
     && install -m 0755 -d /etc/apt/keyrings \
@@ -14,7 +18,9 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends docker-ce-cli docker-compose-plugin nodejs \
     && rm -rf /var/lib/apt/lists/*
 
+# Install the plugin set declared by the repository.
 COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
 RUN jenkins-plugin-cli --plugin-file /usr/share/jenkins/ref/plugins.txt
 
+# Run Jenkins as its normal unprivileged user.
 USER jenkins

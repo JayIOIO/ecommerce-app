@@ -1,7 +1,12 @@
+# Keep local environment files and credentials out of the image build context.
 .env
+# Ignore every local environment variant, then re-allow the safe sample below.
 .env.*
+# This template is shareable; do not put real credentials in it.
 !.env.example
+# The NGINX proxy has no local Node dependencies or generated output.
 node_modules
 coverage
 dist
+# Git metadata is not needed to build the proxy.
 .git

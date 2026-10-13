@@ -1,8 +1,13 @@
+# Keep local environment files and credentials out of the image build context.
 .env
+# Ignore every local environment variant, then re-allow the safe sample below.
 .env.*
+# This template is shareable; do not put real credentials in it.
 !.env.example
+# Frontend dependencies are installed in the image's Node build stage.
 node_modules
 dist
 coverage
 npm-debug.log*
+# Git metadata is not needed to build the frontend.
 .git

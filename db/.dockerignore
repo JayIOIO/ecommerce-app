@@ -1,7 +1,11 @@
+# Do not include local environment files or credentials in the image build context.
 .env
 .env.*
+# Permit the shareable template; it must contain example values only.
 !.env.example
+# Exclude local dependencies and generated output that the database image does not use.
 node_modules
 coverage
 dist
+# Git history is not needed to build the MySQL image.
 .git

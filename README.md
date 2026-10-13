@@ -6,6 +6,8 @@ Final project reference: <https://github.com/JayIOIO/FinalProject-CI-CD-Automati
 
 The modules are separate source folders and share a MySQL database. For local feature work, the frontend calls the APIs through the Vite development proxy; for a containerized run, NGINX routes browser traffic to the frontend and APIs over a private Compose network.
 
+For a detailed walkthrough of the architecture, application flows, database, deployment, and professor Q&A, see [docs/EcomApp-Project-Walkthrough.md](./docs/EcomApp-Project-Walkthrough.md).
+
 ## Application features in this baseline
 
 | Module | Source | Responsibilities |

@@ -1,8 +1,13 @@
+# Keep local environment files and credentials out of the image build context.
 .env
 .env.*
+# Permit the shareable template; it must contain example values only.
 !.env.example
+# Install dependencies in the image instead of copying machine-specific modules.
 node_modules
+# Exclude local logs and generated test/build output.
 npm-debug.log*
 coverage
 dist
+# Git history is not needed to run the service.
 .git

@@ -1,38 +1,48 @@
+# Project name scopes Compose-created containers, network, and volumes.
 name: ${COMPOSE_PROJECT_NAME:-ecommerce-app}
 
 services:
+  # MySQL database and its persistent data storage.
   db:
     image: ${IMAGE_NAMESPACE:-ecomapp}-db:${IMAGE_TAG:-local}
     build:
+      # Dockerfile and .dockerignore for the database image live here.
       context: ./db
     restart: unless-stopped
     environment:
+      # The official MySQL image creates this database and user on first initialization.
       MYSQL_DATABASE: ecommerce_db
       MYSQL_USER: ${COMPOSE_DB_USER:?Set COMPOSE_DB_USER in .env}
       MYSQL_PASSWORD: ${COMPOSE_DB_PASSWORD:?Set COMPOSE_DB_PASSWORD in .env}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env}
     volumes:
+      # Keep database files outside the replaceable database container.
       - db_data:/var/lib/mysql
     networks:
       - app-network
     healthcheck:
+      # Verify MySQL accepts the app user and the initialized users table can be queried.
       test:
         - CMD-SHELL
         - >-
           mysql --protocol=tcp --host=127.0.0.1 --user="$${MYSQL_USER}"
           --password="$${MYSQL_PASSWORD}" "$${MYSQL_DATABASE}"
           --execute='SELECT 1 FROM users LIMIT 0' >/dev/null 2>&1
+      # Allow MySQL time to initialize before counting failed health checks.
       interval: 10s
       timeout: 5s
       retries: 18
       start_period: 30s
 
+  # Authentication API: signup, login, profile updates, and JWT generation.
   auth-service:
     image: ${IMAGE_NAMESPACE:-ecomapp}-auth-service:${IMAGE_TAG:-local}
     build:
+      # Build this service from its own context and Dockerfile.
       context: ./services/auth-service
     restart: unless-stopped
     environment:
+      # Inside Compose, "db" resolves to the database container on app-network.
       PORT: 4001
       DB_HOST: db
       DB_PORT: 3306
@@ -41,11 +51,13 @@ services:
       DB_NAME: ecommerce_db
       JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
     depends_on:
+      # Wait until MySQL passes its health check before starting the API.
       db:
         condition: service_healthy
     networks:
       - app-network
     healthcheck:
+      # Call the service's lightweight /health endpoint from inside its container.
       test:
         - CMD
         - node
@@ -56,12 +68,14 @@ services:
       retries: 12
       start_period: 10s
 
+  # Product search and seller-owned listing API.
   catalog-service:
     image: ${IMAGE_NAMESPACE:-ecomapp}-catalog-service:${IMAGE_TAG:-local}
     build:
       context: ./services/catalog-service
     restart: unless-stopped
     environment:
+      # Use the same database and JWT secret as the other APIs.
       PORT: 4002
       DB_HOST: db
       DB_PORT: 3306
@@ -75,6 +89,7 @@ services:
     networks:
       - app-network
     healthcheck:
+      # Report healthy only if the catalog HTTP process answers its health route.
       test:
         - CMD
         - node
@@ -85,12 +100,14 @@ services:
       retries: 12
       start_period: 10s
 
+  # Checkout, buyer order history, and seller fulfillment API.
   order-service:
     image: ${IMAGE_NAMESPACE:-ecomapp}-order-service:${IMAGE_TAG:-local}
     build:
       context: ./services/order-service
     restart: unless-stopped
     environment:
+      # Connect to MySQL using Compose DNS, not localhost inside this container.
       PORT: 4003
       DB_HOST: db
       DB_PORT: 3306
@@ -104,6 +121,7 @@ services:
     networks:
       - app-network
     healthcheck:
+      # Probe the order API's health route.
       test:
         - CMD
         - node
@@ -114,12 +132,14 @@ services:
       retries: 12
       start_period: 10s
 
+  # Static React frontend, built in a Node stage and served by unprivileged NGINX.
   frontend:
     image: ${IMAGE_NAMESPACE:-ecomapp}-frontend:${IMAGE_TAG:-local}
     build:
       context: ./frontend
     restart: unless-stopped
     depends_on:
+      # Start the web frontend after the APIs report healthy.
       auth-service:
         condition: service_healthy
       catalog-service:
@@ -129,20 +149,24 @@ services:
     networks:
       - app-network
     healthcheck:
+      # Check the frontend NGINX health endpoint.
       test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8080/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 12
       start_period: 5s
 
+  # Public entry point: serves the frontend route and forwards /api requests.
   proxy:
     image: ${IMAGE_NAMESPACE:-ecomapp}-proxy:${IMAGE_TAG:-local}
     build:
       context: ./proxy
       args:
+        # Embed the image tag so GET /version identifies the deployed release.
         APP_VERSION: ${IMAGE_TAG:-local}
     restart: unless-stopped
     depends_on:
+      # Do not expose the proxy until its frontend and API upstreams are healthy.
       frontend:
         condition: service_healthy
       auth-service:
@@ -152,10 +176,12 @@ services:
       order-service:
         condition: service_healthy
     ports:
+      # Publish only NGINX; keep database and backend ports private to app-network.
       - "${PROXY_PORT:-8080}:8080"
     networks:
       - app-network
     healthcheck:
+      # Ensure the public catalog route can pass through the proxy to the catalog API.
       test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8080/api/products || exit 1"]
       interval: 10s
       timeout: 5s
@@ -163,8 +189,10 @@ services:
       start_period: 5s
 
 volumes:
+  # Named Docker-managed volume persists MySQL data when containers are replaced.
   db_data:
 
 networks:
+  # Private bridge network provides service-name DNS between application containers.
   app-network:
     driver: bridge

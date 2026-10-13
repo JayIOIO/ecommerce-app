@@ -1,18 +1,26 @@
+# Jenkins runs as its own Compose project, separate from the application stack.
 services:
   jenkins:
+    # Build Jenkins with Docker/Compose CLI, Node.js, and required plugins.
     build:
       context: .
     restart: unless-stopped
+    # Jenkins UI and optional inbound-agent listener; override host ports if occupied.
     ports:
       - "${JENKINS_HTTP_PORT:-8081}:8080"
       - "${JENKINS_AGENT_PORT:-50000}:50000"
+    # Grant access to the Docker socket group when the host requires it.
     group_add:
       - "${DOCKER_GID:-0}"
+    # Allow Jenkins containers to reach services published on the Docker host.
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
+      # Preserve Jenkins configuration, plugins, and job history across container replacement.
       - jenkins_home:/var/jenkins_home
+      # Let the Docker CLI inside Jenkins control the host Docker daemon.
       - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:
+  # Named persistent storage for Jenkins state.
   jenkins_home:
